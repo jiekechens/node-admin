@@ -6,12 +6,7 @@ const bodyParser = require('body-parser');
 //const  as  =require('multer')
 const userRouters = require('./router/user');
 const port = 3339
-const app = express()
-app.use(cors())
-app.use(bodyParser.json());  // 用于解析 JSON 格式的请求体
-app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/user',userRouters)
 
 if (cluster.isPrimary) {
   console.log(`主進程 PID: ${process.pid}  cup ${numCPUs}`);
@@ -28,7 +23,12 @@ if (cluster.isPrimary) {
   });
 } else {
   // 單個工作進程的伺服器邏輯
-  const app = express();
+  const app = express()
+app.use(cors())
+app.use(bodyParser.json());  // 用于解析 JSON 格式的请求体
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use('/user',userRouters)
 
   // 設定路由和中間件
   app.get('/', (req, res) => {
@@ -36,7 +36,7 @@ if (cluster.isPrimary) {
   });
 
   // 啟動工作進程的伺服器
-  app.listen(3000, () => {
-    console.log(`工作進程 ${process.pid} 開始運行-- ${cluster.isPrimary}`);
+  app.listen(port, () => {
+    console.log(`${port} 工作進程 ${process.pid} 開始運行-- ${cluster.isPrimary}`);
   });
 }
